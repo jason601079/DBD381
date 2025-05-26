@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
@@ -11,22 +11,43 @@ const port = 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// MongoDB connection
-const uri = 'mongodb+srv://taylorleejason:12345@cluster0.q8h13hr.mongodb.net/'; // or use Atlas URI
-const client = new MongoClient(uri);
+// MongoDB connection (use environment variables in real projects)
+const MONGO_URI = 'mongodb+srv://taylorleejason:12345@cluster0.q8h13hr.mongodb.net/Ecom-demo';
 
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('✅ Connected to MongoDB Atlas'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
+// User Schema & Model
+const userSchema = new mongoose.Schema({
+  username: String,
+  email: String,
+  passwordHash: String,
+  isAdmin: Boolean,
+  createdAt: { type: Date, default: Date.now }
+});
 
-// Serve user.html first
+const User = mongoose.model('User', userSchema);
+
+// Order Schema & Model
+const orderSchema = new mongoose.Schema({
+  items: Array,
+  totalAmount: Number,
+  userId: mongoose.Schema.Types.ObjectId,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Order = mongoose.model('Order', orderSchema);
+
+// Serve HTML files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
 
-// Serve static files (CSS, JS, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve index.html separately
 app.get('/index', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -42,8 +63,10 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'User not found' });
     }
 
-    // Basic plaintext password check (should hash in production)
-    if (user.passwordHash !== password) {
+    // Direct comparison (not secure for production use)
+    const passwordMatch = password === user.passwordHash;
+
+    if (!passwordMatch) {
       return res.status(401).json({ message: 'Incorrect password' });
     }
 
@@ -54,28 +77,22 @@ app.post('/login', async (req, res) => {
   }
 });
 
-//Cart route
+
+// Add Order Route
 app.post('/add-order', async (req, res) => {
   try {
-    await client.connect();
-    const db = client.db('Ecom-demo');
-    const orders = db.collection('orders');
+    const orderData = req.body;
+    const newOrder = new Order(orderData);
 
-    // Get the incoming data
-    const order = req.body;
-
-    // Ensure the correct types
-    order._id = new ObjectId(order._id);
-    order.createdAt = new Date(order.createdAt);
-
-    await orders.insertOne(order);
+    await newOrder.save();
     res.status(201).json({ message: 'Order inserted successfully!' });
   } catch (err) {
-    console.error(err);
+    console.error('Add order error:', err);
     res.status(500).json({ message: 'Insertion failed.' });
   }
 });
 
+// Start Server
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`🚀 Server running on http://localhost:${port}`);
 });
