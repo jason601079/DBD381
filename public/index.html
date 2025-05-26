@@ -38,16 +38,16 @@
   }
 
    const products = [
-    { _id: "3e41ee2b181545dba25236d0", name: "Product 1", price: 111.08, imageUrl: "https://example.com/product1.png" },
-    { _id: "7da62b65ac724412b5b4e750", name: "Product 2", price: 304.66, imageUrl: "https://example.com/product2.png" },
-    { _id: "139d1c76783641a1a415bd03", name: "Product 3", price: 19.93, imageUrl: "https://example.com/product3.png" },
-    { _id: "c5c4d28845444ba299b4d170", name: "Product 4", price: 338.83, imageUrl: "https://example.com/product4.png" },
-    { _id: "fd204bc272cb4682b6404c3a", name: "Product 5", price: 250.18, imageUrl: "https://example.com/product5.png" },
-    { _id: "a5a84afa69fd4ab39d90d80a", name: "Product 6", price: 224.65, imageUrl: "https://example.com/product6.png" },
-    { _id: "a92ef9b56075471f8c5dacdd", name: "Product 7", price: 409.60, imageUrl: "https://example.com/product7.png" },
-    { _id: "e80b2c93b0614c1aaecc4a2f", name: "Product 8", price: 398.91, imageUrl: "https://example.com/product8.png" },
-    { _id: "51cf92c07b9144e68ff4133b", name: "Product 9", price: 289.75, imageUrl: "https://example.com/product9.png" },
-    { _id: "4e169fd1049942fba7b77f6e", name: "Product 10", price: 369.53, imageUrl: "https://example.com/product10.png" }
+    { _id: "3e41ee2b181545dba25236d0", name: "Heart burn", price: 299.99, Image: "images/bombay-sapphire-london-dry-gin-134503.webp" },
+    { _id: "7da62b65ac724412b5b4e750", name: "H***y juice", price: 49.99, Image: "/images/images (1).jpg" },
+    { _id: "139d1c76783641a1a415bd03", name: "Blackie", price: 19.99, Image: "/images/images (2).jpg" },
+    { _id: "c5c4d28845444ba299b4d170", name: "OG", price: 219.99, Image: "images/wp-image-31449816432823.webp" },
+    { _id: "fd204bc272cb4682b6404c3a", name: "Bron Bron", price: 499.99, Image: "images/images.jpg" },
+    { _id: "a5a84afa69fd4ab39d90d80a", name: "Medicine", price: 249.99, Image: "images/wp-image-31649110196407.jpg" },
+    { _id: "a92ef9b56075471f8c5dacdd", name: "#1 Seller", price: 149.99, Image: "images/wp-image-32072254783671.webp" },
+    { _id: "e80b2c93b0614c1aaecc4a2f", name: "Jamey", price: 349.99, Image: "images/wp-image32833255801015-scaled-1.webp" },
+    { _id: "51cf92c07b9144e68ff4133b", name: "Another Heart burn", price: 289.99, Image: "images/images (3).jpg" },
+    { _id: "4e169fd1049942fba7b77f6e", name: "Juice", price: 179.99, Image: "images/images (4).jpg" }
   ];
 
   const productList = document.getElementById("productList");
@@ -61,7 +61,7 @@
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <img src="${product.imageUrl}" alt="${product.name}">
+      <img src="${product.Image}" alt="${product.name}">
       <h3>${product.name}</h3>
       <p>Price: R${product.price.toFixed(2)}</p>
       <input type="number" min="1" value="1" id="qty-${product._id}">
