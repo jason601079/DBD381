@@ -33,11 +33,23 @@ const User = mongoose.model('User', userSchema);
 
 // Order Schema & Model
 const orderSchema = new mongoose.Schema({
-  items: Array,
-  totalAmount: Number,
-  userId: mongoose.Schema.Types.ObjectId,
-  createdAt: { type: Date, default: Date.now }
+  userId: String,
+  items: [
+    {
+      productId: String,
+      name: String,
+      price: Number,
+      quantity: Number,
+      _id: false // disables _id for each item
+    }
+  ],
+  total: Number,
+  status: String,
+  createdAt: Date
+}, {
+  versionKey: false // disables __v
 });
+
 
 const Order = mongoose.model('Order', orderSchema);
 
