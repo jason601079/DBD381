@@ -111,10 +111,10 @@ a:hover {
         <!-- Back: Signup -->
         <div class="flip-card-back">
           <h2>Sign Up</h2>
-          <input type="text" placeholder="Username">
-          <input type="email" placeholder="Email">
-          <input type="password" placeholder="Password">
-          <button>Sign Up</button>
+          <input type="text" id="newUsername" placeholder="Username">
+          <input type="email" id="newEmail" placeholder="Email">
+          <input type="password" id="newPassword" placeholder="Password">
+          <button onclick="handleRegistration()">Sign Up</button>
           <p>Already have an account? <a href="#" onclick="flipCard()">Login</a></p>
         </div>
       </div>
@@ -123,23 +123,8 @@ a:hover {
 
   <script>
     function flipCard() {
-  document.getElementById("flipCard").classList.toggle("flipped");
-}
-
-  const formTitle = document.getElementById("form-title");
-  const loginBtn = document.getElementById("loginBtn");
-  const registerBtn = document.getElementById("registerBtn");
-  const toggleBtn = document.getElementById("toggleBtn");
-
-  let isLoginMode = true;
-
-  toggleBtn.addEventListener("click", () => {
-    isLoginMode = !isLoginMode;
-    formTitle.textContent = isLoginMode ? "Login" : "Register";
-    loginBtn.classList.toggle("hidden", !isLoginMode);
-    registerBtn.classList.toggle("hidden", isLoginMode);
-    toggleBtn.textContent = isLoginMode ? "New user? Register here" : "Already have an account? Login";
-  });
+      document.getElementById("flipCard").classList.toggle("flipped");
+    }
 
   async function loginUser() {
   const username = document.getElementById("username").value;
@@ -168,10 +153,41 @@ a:hover {
 }
 
 
-  registerBtn.addEventListener("click", () => {
-    // Registration will be added later
-    alert("Registration not implemented yet.");
-  });
+async function handleRegistration() {
+    const username = document.getElementById("newUsername").value.trim();
+    const email = document.getElementById("newEmail").value.trim();
+    const password = document.getElementById("newPassword").value;
+
+    if (!username || !email || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      const response = await fetch('/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, email, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message);
+        document.getElementById("newUsername").value = "";
+        document.getElementById("newEmail").value = "";
+        document.getElementById("newPassword").value ="";
+        flipCard(); // Flip back to login after successful registration        
+      } else {
+        alert(result.message || "Registration failed.");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("An error occurred during registration.");
+    }
+  }
 </script>
 
 
