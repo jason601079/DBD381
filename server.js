@@ -89,6 +89,32 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    //  Check if username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Username already taken' });
+    }
+
+    const newUser = new User({
+      username,
+      email,
+      passwordHash: password, // consider hashing this in production
+      isAdmin: false
+    });
+
+    await newUser.save();
+    res.status(201).json({ message: 'User registered successfully!' });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ message: 'Registration failed.' });
+  }
+});
+
+
 
 // Add Order Route
 app.post('/add-order', async (req, res) => {
