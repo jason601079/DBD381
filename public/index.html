@@ -10,7 +10,19 @@
 
   <header>
     <h2 id="welcome">Welcome</h2>
+
+    
+  <!-- Update Password Section -->
+  <input type="password" id="newPassword" placeholder="New Password" style="margin-left: 5px;">
+  <button id="updatePasswordBtn" onclick="updatePassword()">Update Password</button>
+
+  <!-- Delete Account Button -->
+  <button id="deleteAccountBtn" style="margin-left: 10px; background-color: red; color: white;" onclick="deleteUserAccount()">
+    Delete Account
+  </button>
+
     <button id="cartBtn">🛒 Cart</button>
+    
   </header>
 
   <div class="product-container" id="productList"></div>
@@ -125,9 +137,7 @@
     cartTotal.textContent = total.toFixed(2);
 }
 
-function insertOrder() {
-        
-  
+function insertOrder() {        
     if (cartItems.length === 0) {
      alert("Your cart is empty.");
      return;
@@ -157,6 +167,76 @@ function insertOrder() {
   .then(data => alert(data.message))
   .catch(err => alert('Error: ' + err.message));
  }
+
+ async function updatePassword() {
+  const userId = localStorage.getItem("userId");
+  const newPassword = document.getElementById("newPassword").value.trim();
+
+  if (!userId) {
+    alert("User not logged in.");
+    return;
+  }
+
+  if (!newPassword) {
+    alert("Please enter a new password.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/update-password/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ newPassword })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert(result.message);
+      document.getElementById("newPassword").value = "";
+    } else {
+      alert(result.message || "Password update failed.");
+    }
+  } catch (error) {
+    console.error("Update error:", error);
+    alert("An error occurred while updating the password.");
+  }
+}
+
+async function deleteUserAccount() {
+  const userId = localStorage.getItem('userId');
+
+  if (!userId) {
+    alert('User not logged in.');
+    return;
+  }
+
+  const confirmed = confirm('Are you sure you want to delete your account? This action cannot be undone.');
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(`/delete-user/${userId}`, {
+      method: 'DELETE',
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert(result.message);
+      // Clear user data from localStorage and maybe redirect to login page
+      localStorage.removeItem('userId');
+      window.location.href = '/user.html';  
+    } else {
+      alert(result.message || 'Failed to delete account.');
+    }
+  } catch (error) {
+    console.error('Delete error:', error);
+    alert('An error occurred while deleting the account.');
+  }
+}
+
 
 </script>
 </html>
