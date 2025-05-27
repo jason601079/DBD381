@@ -144,7 +144,6 @@ function insertOrder() {
      alert("Your cart is empty.");
      return;
     }
-
     const order = {        
      userId: userId,
      items: cartItems.map(item => ({
@@ -156,7 +155,7 @@ function insertOrder() {
      total: cartItems.reduce((acc, item) => acc + item.subtotal, 0),
      status: "pending",
      createdAt: new Date().toISOString()
-   };        
+   };      
 
      fetch('http://localhost:3000/add-order', {
    method: 'POST',

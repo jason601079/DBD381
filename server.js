@@ -92,21 +92,22 @@ app.post('/login', async (req, res) => {
 
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
-
+  // Validate required fields
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
   try {
     //  Check if username already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(409).json({ message: 'Username already taken' });
     }
-
     const newUser = new User({
       username,
       email,
-      passwordHash: password, // consider hashing this in production
+      passwordHash: password, 
       isAdmin: false
     });
-
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully!' });
   } catch (err) {
@@ -174,6 +175,12 @@ app.post('/add-order', async (req, res) => {
 });
 
 // Start Server
-app.listen(port, () => {
-  console.log(`🚀 Server running on http://localhost:${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`🚀 Server running on http://localhost:${port}`);
+  });
+  
+}
+
+
+module.exports = app; 
