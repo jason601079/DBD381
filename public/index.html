@@ -22,10 +22,29 @@
     <button id="cartBtn">🛒 Cart</button>    
   </header>
 
-  <!-- Search Box Section -->
-  <div style="display: flex; justify-content: center; margin: 20px 0;">
-    <label for="searchInput" style="margin-right: 10px;">Search Products:</label>
-    <input type="text" id="searchInput" placeholder="Enter product name...">
+ 
+  <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
+    <label for="searchInput" style="font-weight: bold;">Search Products:</label>
+    <input type="text" id="searchInput" placeholder="Enter product name..." 
+           style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+
+    <label for="categorySelect" style="font-weight: bold;">Category:</label>
+    <select id="categorySelect" 
+            style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 150px;">
+        <option value="" disabled selected>Select Category</option>
+        <option value="Brandy">Brandy</option>
+        <option value="Whiskey">Whiskey</option>
+        <option value="Wine">Wine</option>
+        <option value="Beer">Beer</option>
+        <option value="Tequila">Tequila</option>
+        <option value="Cognac">Cognac</option>
+        <option value="Liquer">Liquer</option>        
+    </select>
+
+    <button type="button" onclick="loadProductsAndRender()" 
+            style="padding: 10px 16px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        View All Products
+    </button>
 </div>
 
   <div class="product-container" id="productList"></div>
@@ -42,6 +61,39 @@
 </body>
 
 <script >
+
+const categorySelect = document.getElementById('categorySelect');
+
+categorySelect.addEventListener('change', function () {
+  const selectedCategory = this.value;
+
+  fetch('http://localhost:3000/api/products')
+    .then(res => res.json())
+    .then(products => {
+      productList.innerHTML = ''; // Clear existing cards
+
+      if (!selectedCategory) {
+        // If no category selected, show all products
+        renderProductCards(products);
+        return;
+      }
+
+      // Filter products by category (case-sensitive or insensitive, here assuming exact match)
+      const filteredProducts = products.filter(product => product.category === selectedCategory);
+
+      if (filteredProducts.length > 0) {
+        renderProductCards(filteredProducts);
+      } else {
+        productList.innerHTML = '<p>No products found in this category.</p>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching products:', error);
+      productList.innerHTML = '<p>Failed to load products.</p>';
+    });
+});
+
+
   const userId = localStorage.getItem('userId');
     const welcomeEl = document.getElementById('welcome');
 
@@ -59,6 +111,11 @@
   const cartTotal = document.getElementById("cartTotal");
 
   function loadProductsAndRender() {
+// Clear category select and search input
+document.getElementById('categorySelect').selectedIndex = 0;
+  document.getElementById('searchInput').value = '';
+
+
   fetch('http://localhost:3000/api/products')
     .then(response => {
       if (!response.ok) {
