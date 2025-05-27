@@ -21,6 +21,18 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
+  const productSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    description: String,
+    price: { type: Number, required: true },
+    stock: Number,
+    category: String,
+    imageUrl: String,
+    createdAt: { type: Date, default: Date.now }
+  });
+  
+  const Product = mongoose.model('Product', productSchema);
+
 // User Schema & Model
 const userSchema = new mongoose.Schema({
   username: String,
@@ -28,6 +40,8 @@ const userSchema = new mongoose.Schema({
   passwordHash: String,
   isAdmin: Boolean,
   createdAt: { type: Date, default: Date.now }
+}, {
+  versionKey: false // disables __v
 });
 
 const User = mongoose.model('User', userSchema);
@@ -63,6 +77,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/index', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// API route to get all products
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await Product.find();  // fetch all products
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Server error fetching products' });
+  }
 });
 
 // Login route
