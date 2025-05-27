@@ -11,21 +11,22 @@
   
 
   <header>
-    <h2 id="welcome">Welcome</h2>
-
-    
-  <!-- Update Password Section -->
-  <input type="password" id="newPassword" placeholder="New Password" style="margin-left: 5px;">
-  <button id="updatePasswordBtn" onclick="updatePassword()">Update Password</button>
-
-  <!-- Delete Account Button -->
-  <button id="deleteAccountBtn" style="margin-left: 10px; background-color: red; color: white;" onclick="deleteUserAccount()">
-    Delete Account
-  </button>
-
-    <button id="cartBtn">🛒 Cart</button>
-    
+    <h2 id="welcome">Welcome</h2>    
+    <!-- Update Password Section -->
+    <input type="password" id="newPassword" placeholder="New Password" style="margin-left: 5px;">
+    <button id="updatePasswordBtn" onclick="updatePassword()">Update Password</button>
+    <!-- Delete Account Button -->
+    <button id="deleteAccountBtn" style="margin-left: 10px; background-color: red; color: white;" onclick="deleteUserAccount()">
+      Delete Account
+    </button>
+    <button id="cartBtn">🛒 Cart</button>    
   </header>
+
+  <!-- Search Box Section -->
+  <div style="display: flex; justify-content: center; margin: 20px 0;">
+    <label for="searchInput" style="margin-right: 10px;">Search Products:</label>
+    <input type="text" id="searchInput" placeholder="Enter product name...">
+</div>
 
   <div class="product-container" id="productList"></div>
 
@@ -115,6 +116,81 @@
 }
 
 loadProductsAndRender();
+
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("input", function () {
+  const searchTerm = this.value.trim().toLowerCase();
+
+  fetch('http://localhost:3000/api/products')
+    .then(res => res.json())
+    .then(products => {
+      productList.innerHTML = ''; // Clear existing cards
+
+      if (searchTerm === '') {
+        renderProductCards(products); // Show all if search is empty
+        return;
+      }
+
+      const matchedProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm)
+      );
+
+      if (matchedProducts.length > 0) {
+        renderProductCards(matchedProducts);
+      } else {
+        productList.innerHTML = '<p>No product found.</p>';
+      }
+    })
+    .catch(error => {
+      console.error('Error during search:', error);
+      productList.innerHTML = '<p>Failed to search products.</p>';
+    });
+});
+
+function renderProductCards(products) {
+  products.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${product.imageUrl}" alt="${product.name}">
+      <h3>${product.name}</h3>
+      <p>Price: R${product.price.toFixed(2)}</p>
+      <input type="number" min="1" value="1" id="qty-${product._id}">
+      <button id="btn-${product._id}">Add to Cart</button>
+    `;
+    productList.appendChild(card);
+
+    const button = card.querySelector(`#btn-${product._id}`);
+    button.addEventListener("click", () => {
+      const qtyInput = document.getElementById(`qty-${product._id}`);
+      const quantity = parseInt(qtyInput.value);
+
+      if (quantity < 1 || isNaN(quantity)) {
+        alert("Please enter a valid quantity.");
+        return;
+      }
+
+      const existing = cartItems.find(item => item.id === product._id);
+      if (existing) {
+        existing.quantity += quantity;
+        existing.subtotal = +(existing.quantity * existing.unitPrice).toFixed(2);
+      } else {
+        cartItems.push({
+          id: product._id,
+          name: product.name,
+          unitPrice: product.price,
+          quantity: quantity,
+          subtotal: +(product.price * quantity).toFixed(2)
+        });
+      }
+
+      updateCartSidebar();
+    });
+  });
+}
+
+
 
   // Cart UI handlers
   document.getElementById("cartBtn").addEventListener("click", () => {
