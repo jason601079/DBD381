@@ -5,6 +5,7 @@
 
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 </head>
 <body>
@@ -55,12 +56,23 @@
     <h3>Your Cart</h3>
     <div id="cartItemsContainer"></div>
     <p><strong>Total: R<span id="cartTotal">0.00</span></strong></p>
+    <button id="clearCartBtn" onclick="emptyCart()">
+      <i class="fas fa-trash"></i> Clear Cart
+  </button>
     <button id="checkoutBtn" onclick="insertOrder()">Checkout</button>
   </div>
 
 </body>
 
 <script >
+
+function emptyCart() {
+    // Clear the cart array
+    cartItems.length = 0;
+    // Clear cart UI
+    document.getElementById("cartItemsContainer").innerHTML = "";
+    document.getElementById("cartTotal").textContent = "0.00";  
+}
 
 const categorySelect = document.getElementById('categorySelect');
 
@@ -112,9 +124,8 @@ categorySelect.addEventListener('change', function () {
 
   function loadProductsAndRender() {
 // Clear category select and search input
-document.getElementById('categorySelect').selectedIndex = 0;
+  document.getElementById('categorySelect').selectedIndex = 0;
   document.getElementById('searchInput').value = '';
-
 
   fetch('http://localhost:3000/api/products')
     .then(response => {
@@ -188,11 +199,9 @@ searchInput.addEventListener("input", function () {
         renderProductCards(products); // Show all if search is empty
         return;
       }
-
       const matchedProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchTerm)
       );
-
       if (matchedProducts.length > 0) {
         renderProductCards(matchedProducts);
       } else {
@@ -247,8 +256,6 @@ function renderProductCards(products) {
   });
 }
 
-
-
   // Cart UI handlers
   document.getElementById("cartBtn").addEventListener("click", () => {
     cartSidebar.classList.add("active");
@@ -275,13 +282,14 @@ function renderProductCards(products) {
     });
 
     cartTotal.textContent = total.toFixed(2);
-}
+} 
 
 function insertOrder() {        
     if (cartItems.length === 0) {
      alert("Your cart is empty.");
      return;
     }
+
     const order = {        
      userId: userId,
      items: cartItems.map(item => ({
@@ -303,7 +311,10 @@ function insertOrder() {
    body: JSON.stringify(order)
      })
   .then(res => res.json())
-  .then(data => alert(data.message))
+  .then(data => {
+    alert(data.message);
+    emptyCart(); // Clear cart after successful order
+  })
   .catch(err => alert('Error: ' + err.message));
  }
 

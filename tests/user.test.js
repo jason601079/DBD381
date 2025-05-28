@@ -10,15 +10,12 @@ let mongoServer;
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
-  
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect(uri);
     }
-
     jest.spyOn(console, 'error').mockImplementation(() => {}); // Silence console.error
   });
   
-
 afterEach(async () => {
   await User.deleteMany();
 });
