@@ -109,12 +109,7 @@ categorySelect.addEventListener('change', function () {
   const userId = localStorage.getItem('userId');
     const welcomeEl = document.getElementById('welcome');
 
-  if (userId) {
-    welcomeEl.textContent = `Welcome, ${userId}`;
-  } else {
-    alert("You must log in first.");
-    window.location.href = "/";
-  }
+  
 
   const productList = document.getElementById("productList");
   const cartItems = [];
