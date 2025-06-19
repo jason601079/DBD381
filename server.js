@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-
+require('dotenv').config();
 
 const app = express();
 const port = 3000;
@@ -13,11 +13,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// MongoDB connection (use environment variables in real projects)
-const MONGO_URI = 'mongodb+srv://taylorleejason:12345@cluster0.q8h13hr.mongodb.net/Ecom-demo?retryWrites=true&w=majority';
 
 
-mongoose.connect(MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
